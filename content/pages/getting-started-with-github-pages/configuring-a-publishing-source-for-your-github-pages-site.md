@@ -1,6 +1,11 @@
 ---
-title: Configuring a publishing source for your GitHub Pages site
-intro: 'You can configure your {% data variables.product.prodname_pages %} site to publish when changes are pushed to a specific branch, or you can write a {% data variables.product.prodname_actions %} workflow to publish your site.'
+title: B2B Marketplace India – Find Verified Suppliers, Manufacturers & Exporters
+intro: 'You can configure your {% data variables.product.prodname_pages %} B2B Marketplace India
+
+B2B Marketplace India – Find Verified Suppliers, Manufacturers & Exporters
+
+Finding reliable manufacturers, suppliers, exporters, wholesalers, and business service providers in India can be challenging for businesses looking to source products and expand their market. A trusted B2B marketplace in India can make this process easier by connecting buyers with businesses from different industries and locations.
+ {% data variables.product.prodname_actions %} workflow to publish your site.'
 redirect_from:
   - /articles/configuring-a-publishing-source-for-github-pages
   - /articles/configuring-a-publishing-source-for-your-github-pages-site
