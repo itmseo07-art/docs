@@ -4,7 +4,9 @@ shortTitle: Give access to private registries
 intro: If your organization uses private registries, you can improve the results of {% data variables.product.prodname_code_scanning %} analysis and enable {% data variables.product.prodname_dependabot %} to maintain more dependencies by setting up access to these registries.
 allowTitleToDifferFromFilename: true
 versions:
-  feature: org-private-registry
+  fpt: '*'
+  ghec: '*'
+  ghes: '*'
 redirect_from:
   - /code-security/securing-your-organization/enabling-security-features-in-your-organization/giving-org-access-private-registries
 contentType: how-tos
@@ -105,9 +107,6 @@ See [AUTOTITLE](/code-security/how-tos/secure-your-supply-chain/manage-your-depe
 ### Configuring OIDC authentication for a private registry
 
 OIDC (OpenID Connect) authentication allows {% data variables.product.prodname_dependabot %} to use short-lived credentials from your cloud identity provider to access private registries, eliminating the need to store long-lived secrets. With OIDC, credentials are generated dynamically for each {% data variables.product.prodname_dependabot %} update job. You must configure a trust relationship between your cloud provider and {% data variables.product.github %} before {% data variables.product.prodname_dependabot %} can authenticate.
-
-> [!NOTE]
-> OIDC authentication for organization-level private registries is currently supported by {% data variables.product.prodname_dependabot %}. It is not supported by {% data variables.product.prodname_code_scanning %} default setup.
 
 When you select **OIDC** as the authentication method for a private registry, choose one of the supported providers and fill in the required fields:
 

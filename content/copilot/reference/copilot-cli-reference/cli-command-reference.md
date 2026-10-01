@@ -204,13 +204,17 @@ Each session in the sidebar shows an indicator of its current state.
 
 | Indicator | Meaning |
 |-----------|---------|
-| `●` steady | A running but idle session—waiting for your next prompt. |
-| `●` pulsing | A running session. The agent is actively processing a turn. |
-| `!` | The session needs permission to continue. |
-| `?` | The session is waiting for you (a question or a choice). |
-| `○` | A resumable session—saved, but not currently running. |
+| Green `●` (steady) | The session is idle. It is waiting for your next prompt. |
+| Purple `●` (pulsing) | A turn is in flight. The agent is actively working. |
+| Blue `●` (steady) | The agent finished a turn while you were in another session, and you have not opened it since. Opening the session clears this unread state. |
+| Yellow `●` (steady) | The agent stopped on an error, or otherwise needs your attention. |
+| Gray `○` (steady) | A resumable session. It is saved, but not currently running. |
+| Yellow `!` | The session needs permission to continue. |
+| Yellow `?` | The session is waiting for you to answer a question or make a choice. |
 
-The text of sessions in the default CLI chat mode uses the default text color. Different colors are used in plan mode and in autopilot mode.
+The color names above are a guide. The exact shades depend on your terminal's color scheme and the theme you have set with `/theme`. For example, the `github` theme uses its own fixed colors, and the `colorblind` theme uses blue and yellow in place of green and red. On terminals without full color support, the dots use your terminal's own green, blue, and yellow.
+
+The colors named above relate to the default chat mode. Plan mode and autopilot mode tint some dots differently. The session name's text color also changes in those modes. Because color can shift with your terminal, theme, and mode, the steady or pulsing shape and the `!`, `?`, and `○` markers are the most reliable cues.
 
 ### Sessions sidebar settings
 
@@ -383,7 +387,11 @@ The current-session sidebar lets you browse and switch between sessions without 
 | `s` (sidebar-focused) | Cycle the sort order: recent → created → name → none. |
 | `x`, `x` (sidebar-focused) | Close the selected card (armed for one keystroke, shown in red, before closing). |
 
-The sidebar's divider can be dragged to resize it, and it auto-collapses below a minimum usable width. Each card shows a status dot, the session name, and its Git branch (or working directory when there is no branch). The foreground session's title is highlighted in accent color, and its card carries a persistent subtle fill. The active sort order (`recent`, `created`, `name`, or `none` for insertion order) persists across restarts.
+The sidebar's divider can be dragged to resize it, and it auto-collapses below a minimum usable width. Each card shows a status dot, the session name, and its Git branch (or working directory when there is no branch). The foreground session's title is highlighted in accent color, and its card carries a persistent subtle fill.
+
+Dots indicate a session's status. For what each dot means, see [Session status indicators](#session-status-indicators).
+
+The active sort order (`recent`, `created`, `name`, or `none` for insertion order) persists across restarts.
 
 Mouse actions mirror the keyboard: click a card to switch the foreground session, double-click a card or empty rail space to focus the sidebar, and click the timeline pane while the sidebar is focused to return focus to it.
 
@@ -479,7 +487,7 @@ These are the slash commands you can use from within an interactive CLI session.
 | `/downgrade VERSION`                              | Download and restart into a specific CLI version. Available for team accounts. |
 | `/env`                                              | Show loaded environment details (instructions, MCP servers, skills, agents, hooks, plugins, LSPs, extensions). |
 | `/every [INTERVAL] PROMPT`, `/every`              | Schedule a recurring prompt, skill, or schedulable slash command for the current session (for example, `/every 1h run tests` or `/every 1d /chronicle standup`). With no arguments the schedule manager is displayed. {% data reusables.copilot.experimental %} |
-| `/exit`, `/quit`                                    | Close the current session. If other sessions are running, this foregrounds the newest remaining one instead of quitting. Quits the CLI only when it is the last open session. `/exit print` always tears down the CLI and offers to dump the transcript. |
+| `/exit`, `/quit`                                    | Close the current session. If other sessions are running, this foregrounds the newest remaining one instead of quitting. Quits the CLI only when it is the last open session. `/exit print` always tears down the CLI and offers to dump the transcript. `/exit` and `/quit` (including their `print` variant) can also be queued with <kbd>Ctrl</kbd>+<kbd>Q</kbd> while the agent is running—the CLI closes the session once the current turn, and any queued shell command ahead of it, finishes. |
 | `/extensions [manage\|mode]`, `/extension`          | Manage CLI extensions. {% data reusables.copilot.experimental %} |
 | `/experimental [on\|off\|show]`                     | Toggle, set, or show experimental features. |
 | `/feedback`, `/bug`                                 | Provide feedback about the CLI. |
@@ -511,7 +519,7 @@ These are the slash commands you can use from within an interactive CLI session.
 | `/plugin marketplace list`           | List registered marketplaces. |
 | `/plugin marketplace browse NAME`    | Browse plugins in a marketplace. |
 | `/plugin marketplace update [NAME]` (alias `refresh`) | Re-fetch a marketplace's plugin catalog, or every registered marketplace when no name is given. |
-| `/pr [view\|create\|fix\|auto\|automerge]`          | Manage pull requests for the current branch. `auto` drives the pull request to green and stops; `automerge` (alias: `agentmerge`) drives the pull request to green and merges it. See [AUTOTITLE](/copilot/how-tos/copilot-cli/use-copilot-cli/manage-pull-requests). |
+| `/pr [view\|create\|fix\|auto\|automerge]`          | Manage pull requests for the current branch. `auto` drives the pull request to green and stops; `automerge` (alias: `agentmerge`) drives the pull request to green and merges it. When the repository has a pull request template (`.github/pull_request_template.md` or a file under `.github/PULL_REQUEST_TEMPLATE/`), `create` follows it by default—preserving headings, comments, and checklist items, and filling in accurate details instead of writing a generic body. Ask {% data variables.product.prodname_copilot_short %} to skip the template if you don't want it applied. See [AUTOTITLE](/copilot/how-tos/copilot-cli/use-copilot-cli/manage-pull-requests). |
 | `/refine TEXT`                                      | Rewrite a roughly composed prompt into a clear one for review. Run with no arguments (via <kbd>Ctrl</kbd>+<kbd>X</kbd> then `/refine`) to clean up the current input box. Can be particularly useful for prompts entered by speaking. |
 | `/remote [on\|off]`                                 | Show the remote control status (if no argument provided), enable remote steering (`on`), or end the remote connection (`off`). See [AUTOTITLE](/copilot/how-tos/copilot-cli/use-copilot-cli/steer-remotely). |
 | `/rename [NAME]`                                    | Rename the current session (auto-generates a name if omitted; alias for `/session rename`). |
@@ -821,7 +829,8 @@ copilot --deny-tool='write(secret.txt)'
 | `GITHUB_TOKEN` | Authentication token. |
 | `PLAIN_DIFF` | Set to `true` to disable rich diff rendering. |
 | `USE_BUILTIN_RIPGREP` | Set to `false` to use the system ripgrep instead of the bundled version. |
-| `USE_TGREP` | Set to `true` to always use [tgrep](https://github.com/microsoft/tgrep), a trigram-indexed search engine, even outside a Git repository or on a virtualized or network filesystem (for example, a VFS for Git checkout, or an SMB/9p mount), or `false` to always use ripgrep. When forced outside a Git repository, tgrep indexes the working directory itself, so avoid forcing it somewhere large such as your home directory. Windows cloud-sync folders (for example, OneDrive) always use ripgrep, even when this is set to `true`. When unset, {% data variables.copilot.copilot_cli_short %} automatically switches from ripgrep to tgrep only inside a Git repository, on a non-virtualized filesystem, and once it exceeds a platform-specific file-count threshold. |
+ | `USE_TGREP` | Set to `true` to always use [tgrep](https://github.com/microsoft/tgrep), a trigram-indexed search engine, even outside a Git repository or on a virtualized or network filesystem (for example, a VFS for Git checkout, or an SMB/9p mount), or `false` to always use ripgrep. When forced outside a Git repository, tgrep indexes the working directory itself, so avoid forcing it somewhere large such as your home directory. Windows cloud-sync folders (for example, OneDrive) always use ripgrep, even when this is set to `true`. When unset, {% data variables.copilot.copilot_cli_short %} automatically switches from ripgrep to tgrep only inside a Git repository, on a non-virtualized filesystem, and once it reaches the file-count threshold set by `TGREP_FILE_COUNT_THRESHOLD`. Setting `USE_TGREP=true` bypasses this threshold entirely. `USE_TGREP=false` still disables tgrep. |
+| `TGREP_FILE_COUNT_THRESHOLD` | Minimum file count for automatic tgrep indexed search (non-negative integer; default: `10000` on Windows, `50000` elsewhere). Invalid values fall back to the platform default. `0` removes only the file-count requirement—other automatic-start checks still apply. |
 
 ## Configuration file settings
 
@@ -864,10 +873,22 @@ Use `--sandbox` or `--no-sandbox` with `copilot init` to enable or disable the O
 | `GEMINI.md` | In Git root and cwd |
 | `AGENTS.md` | In Git root and cwd |
 | `.github/instructions/**/*.instructions.md` | In Git root and cwd |
+| `.claude/rules/**/*.md` | In Git root and cwd |
 | `.github/copilot-instructions.md` | In Git root and cwd |
 | `$HOME/.copilot/copilot-instructions.md` | — |
 | `$HOME/.copilot/instructions/**/*.instructions.md` | — |
 | `COPILOT_CUSTOM_INSTRUCTIONS_DIRS` | Additional directories via environment variable. |
+
+{% data variables.copilot.copilot_cli_short %} reads Claude Code rule files from `.claude/rules/**/*.md` the same way it reads `.github/instructions/**/*.instructions.md` files. Scope a rule to matching files with a `paths` (or `applyTo`) frontmatter key:
+
+```markdown
+---
+paths: "src/api/**/*.ts"
+description: API layer conventions
+---
+
+Use the shared `ApiError` type for all thrown errors in this directory.
+```
 
 ### Custom instructions imports
 
@@ -1234,7 +1255,7 @@ Commands are an alternative to skills stored as individual `.md` files in `.clau
 
 ## Custom agents reference
 
-Custom agents are specialized AI agents defined in Markdown files. The filename (minus extension) becomes the agent ID. Use `.agent.md` or `.md` as the file extension.
+Custom agents are specialized AI agents defined in Markdown files. For user, project, and added-root agents, the agent ID is derived from the file's path relative to the `agents` directory. The CLI removes the `.agent.md` or `.md` extension and replaces directory separators with `--`. For example, `agents/team/reviewer.agent.md` has the ID `team--reviewer`.
 
 ### Built-in agents
 
@@ -1263,7 +1284,7 @@ Only the root agent can call `store_memory` or `vote_memory` to save or vote on 
 | `model` | string | No | AI model for this agent. When unset, inherits the outer agent's model. When the session model is set to `Auto` (server-selected), subagents always inherit the resolved session model regardless of this field. |
 | `models` | string[] | No | Authored models in priority order. The runtime uses the first model the user's plan can access; if none resolve, dispatch falls back to the session's model. Overrides `model` when both are set. |
 | `modelPolicy` | string | No | `"preferred"` (default) lets `model`/`models` be overridden by a `subagents` override in `~/.copilot/settings.json` or the `/subagents` picker. `"required"` locks dispatch to one of the authored models—overrides are rejected and the picker's **Model** entry is disabled. |
-| `name` | string | No | Display name. Defaults to the filename. |
+| `name` | string | No | Display name. You can also use this value to select the agent, for example with `--agent`. Defaults to the agent ID. |
 | `reasoningEffort` | string | No | Default reasoning effort for this agent (for example, `"low"`, `"medium"`, or `"high"`). When unset, inherits the outer agent's effort. |
 | `tools` | string[] | No | Tools available to the agent. Default: `["*"]` (all tools). Include `*` anywhere in the list to grant full tool access—for example, `["view", "*"]` grants every tool, not just `view`. |
 
@@ -1271,14 +1292,20 @@ Only the root agent can call `store_memory` or `vote_memory` to save or vote on 
 
 ### Custom agent locations
 
-| Scope | Location |
-|-------|----------|
-| Project | `.github/agents/` or `.claude/agents/` |
-| User | `~/.copilot/agents/` |
-| Plugin | `<plugin>/agents/` |
-| Added root | `.github/agents/` under a directory added with `--add-dir`, `/add-dir`, or the SDK's `additionalDirectories`. Adding the directory is a trust decision: its agents are loaded as trusted configuration. |
+The CLI loads custom agents in the following priority order. When agents have the same ID, the first agent loaded is used.
 
-For project-scoped agents, the CLI walks upward from your current working directory to the Git root, loading `.github/agents/` and `.claude/agents/` directories at each ancestor level. This means each package or subdirectory in a monorepo can contribute its own agents. When multiple `.github/agents/` directories exist in the path, all are loaded, with the deepest directory taking highest priority. The `.github/agents/` convention takes precedence over `.claude/agents/` at the same level. User-level agents have lower priority than project-level agents. Plugin agents have the lowest priority.
+| Priority | Scope | Location |
+|----------|-------|----------|
+| 1 (highest) | User | `~/.copilot/agents/` |
+| 2 | Project | `.github/agents/`, from the current working directory upward to the Git root |
+| 3 | Project | `.claude/agents/`, from the current working directory upward to the Git root |
+| 4 | Added root | `.github/agents/` under a directory added with `--add-dir`, `/add-dir`, or the SDK's `additionalDirectories`. Adding the directory is a trust decision: its agents are loaded as trusted configuration. |
+| 5 | Plugin | `<plugin>/agents/` |
+| 6 (lowest) | Remote | Organization or enterprise agents |
+
+Within each project row, the CLI checks the current working directory first, then each parent directory up to the Git root, so the deepest directory has the highest priority. Every project `.github/agents/` directory is loaded before any project `.claude/agents/` directory. This means each package or subdirectory in a monorepo can contribute its own agents.
+
+The optional `name` frontmatter field does not control deduplication. Agents with the same `name` but different IDs both load. If the value passed to `--agent` matches more than one agent's ID or `name`, the CLI uses the first matching agent in the priority order above.
 
 ### Repository custom instructions for subagents
 
